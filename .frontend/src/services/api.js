@@ -73,11 +73,11 @@ export const api = {
       }
     });
     const queryString = query.toString();
-    return request(`/words?${queryString}`);
+    return request(`/api/words?${queryString}`);
   },
 
   getWord: (id) => {
-    return request(`/words/${id}`);
+    return request(`/api/words/${id}`);
   },
 
   getTestQuestion: (type, { seenIds } = {}) => {
