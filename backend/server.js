@@ -17,11 +17,13 @@ const app = express();
 connectDB().then(bootstrapAdmin);
 
 // Middlewares
+const allowedOrigins = ["https://vocademy.onrender.com"];
 app.use(
   cors({
-    origin: "*", // In development, allow requests from any host
+    origin: process.env.NODE_ENV === "production" ? allowedOrigins : "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   }),
 );
 app.use(express.json());

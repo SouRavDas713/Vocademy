@@ -1,21 +1,21 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
-let authToken = localStorage.getItem('vocademy_token') || '';
+let authToken = localStorage.getItem("vocademy_token") || "";
 
 export const setAuthToken = (token) => {
-  authToken = token || '';
+  authToken = token || "";
   if (authToken) {
-    localStorage.setItem('vocademy_token', authToken);
+    localStorage.setItem("vocademy_token", authToken);
   } else {
-    localStorage.removeItem('vocademy_token');
+    localStorage.removeItem("vocademy_token");
   }
 };
 
 // Fetch helper to call backend
 const request = async (endpoint, options = {}) => {
   const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers
+    "Content-Type": "application/json",
+    ...options.headers,
   };
 
   if (authToken) {
@@ -24,10 +24,10 @@ const request = async (endpoint, options = {}) => {
 
   const config = {
     ...options,
-    headers
+    headers,
   };
 
-  if (config.body && typeof config.body === 'object') {
+  if (config.body && typeof config.body === "object") {
     config.body = JSON.stringify(config.body);
   }
 
@@ -36,7 +36,7 @@ const request = async (endpoint, options = {}) => {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || 'Something went wrong');
+      throw new Error(result.message || "Something went wrong");
     }
 
     return result;
@@ -49,25 +49,25 @@ const request = async (endpoint, options = {}) => {
 export const api = {
   // Auth
   signup: (credentials) => {
-    return request('/auth/signup', {
-      method: 'POST',
-      body: credentials
+    return request("/auth/signup", {
+      method: "POST",
+      body: credentials,
     });
   },
 
   login: (credentials) => {
-    return request('/auth/login', {
-      method: 'POST',
-      body: credentials
+    return request("/auth/login", {
+      method: "POST",
+      body: credentials,
     });
   },
 
-  me: () => request('/auth/me'),
+  me: () => request("/auth/me"),
 
   // Words
   getWords: (params = {}) => {
     const query = new URLSearchParams();
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
       if (params[key] !== undefined && params[key] !== null) {
         query.append(key, params[key]);
       }
@@ -90,33 +90,33 @@ export const api = {
   },
 
   createWord: (wordData) => {
-    return request('/words', {
-      method: 'POST',
-      body: wordData
+    return request("/words", {
+      method: "POST",
+      body: wordData,
     });
   },
 
   updateWord: (id, wordData) => {
     return request(`/words/${id}`, {
-      method: 'PUT',
-      body: wordData
+      method: "PUT",
+      body: wordData,
     });
   },
 
   getLearningWords: () => {
-    return request('/learning');
+    return request("/learning");
   },
 
   addLearningWord: (wordId) => {
-    return request('/learning', {
-      method: 'POST',
-      body: { wordId }
+    return request("/learning", {
+      method: "POST",
+      body: { wordId },
     });
   },
 
   markLearningWordLearned: (wordId) => {
     return request(`/learning/${wordId}/learned`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   },
   recordTestAnswer: ({ wordId, isCorrect }) => {
