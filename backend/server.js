@@ -17,7 +17,10 @@ const app = express();
 connectDB().then(bootstrapAdmin);
 
 // Middlewares
-const allowedOrigins = ["https://vocademy.onrender.com"];
+const allowedOrigins = [
+  "https://vocademy.onrender.com",
+  "https://vocademy7.netlify.app",
+];
 app.use(
   cors({
     origin: process.env.NODE_ENV === "production" ? allowedOrigins : "*",

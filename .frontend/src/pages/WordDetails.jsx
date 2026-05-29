@@ -129,7 +129,7 @@ export const WordDetails = () => {
               Word Details
             </span>
             <div className="space-y-2">
-              <h1 className="break-words text-4xl font-extrabold tracking-tight text-zinc-950 md:text-5xl font-display">
+              <h1 className="wrap-break-word text-4xl font-extrabold tracking-tight text-zinc-950 md:text-5xl font-display">
                 {word.word}
               </h1>
               {word.pronunciation && (
