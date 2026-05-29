@@ -65,64 +65,65 @@ export const api = {
   me: () => request("/auth/me"),
 
   // Words
-  getWords: (params = {}) => {
-    const query = new URLSearchParams();
-    Object.keys(params).forEach((key) => {
-      if (params[key] !== undefined && params[key] !== null) {
-        query.append(key, params[key]);
-      }
-    });
-    const queryString = query.toString();
-    return request(`/api/words?${queryString}`);
-  },
-
-  getWord: (id) => {
-    return request(`/api/words/${id}`);
-  },
-
-  getTestQuestion: (type, { seenIds } = {}) => {
-    const query = new URLSearchParams();
-    query.append("type", type);
-    if (seenIds && seenIds.length) {
-      query.append("seenIds", seenIds.join(","));
+getWords: (params = {}) => {
+  const query = new URLSearchParams();
+  Object.keys(params).forEach((key) => {
+    if (params[key] !== undefined && params[key] !== null) {
+      query.append(key, params[key]);
     }
-    return request(`/words/test-question?${query.toString()}`);
-  },
+  });
+  const queryString = query.toString();
+  return request(`/words?${queryString}`);
+},
 
-  createWord: (wordData) => {
-    return request("/words", {
-      method: "POST",
-      body: wordData,
-    });
-  },
+getWord: (id) => {
+  return request(`/words/${id}`);
+},
 
-  updateWord: (id, wordData) => {
-    return request(`/words/${id}`, {
-      method: "PUT",
-      body: wordData,
-    });
-  },
+getTestQuestion: (type, { seenIds } = {}) => {
+  const query = new URLSearchParams();
+  query.append("type", type);
+  if (seenIds && seenIds.length) {
+    query.append("seenIds", seenIds.join(","));
+  }
+  return request(`/words/test-question?${query.toString()}`);
+},
 
-  getLearningWords: () => {
-    return request("/learning");
-  },
+createWord: (wordData) => {
+  return request("/words", {
+    method: "POST",
+    body: wordData,
+  });
+},
 
-  addLearningWord: (wordId) => {
-    return request("/learning", {
-      method: "POST",
-      body: { wordId },
-    });
-  },
+updateWord: (id, wordData) => {
+  return request(`/words/${id}`, {
+    method: "PUT",
+    body: wordData,
+  });
+},
 
-  markLearningWordLearned: (wordId) => {
-    return request(`/learning/${wordId}/learned`, {
-      method: "DELETE",
-    });
-  },
-  recordTestAnswer: ({ wordId, isCorrect }) => {
-    return request("/words/test-answer", {
-      method: "POST",
-      body: { wordId, isCorrect },
-    });
-  },
+getLearningWords: () => {
+  return request("/learning");
+},
+
+addLearningWord: (wordId) => {
+  return request("/learning", {
+    method: "POST",
+    body: { wordId },
+  });
+},
+
+markLearningWordLearned: (wordId) => {
+  return request(`/learning/${wordId}/learned`, {
+    method: "DELETE",
+  });
+},
+
+recordTestAnswer: ({ wordId, isCorrect }) => {
+  return request("/words/test-answer", {
+    method: "POST",
+    body: { wordId, isCorrect },
+  });
+},
 };
