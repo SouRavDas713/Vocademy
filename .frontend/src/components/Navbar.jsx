@@ -1,9 +1,11 @@
 import { NavLink, Link } from "react-router-dom";
-import { BookOpen, LogIn, LogOut, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, LogIn, LogOut, Sparkles, Menu, X } from "lucide-react";
 import { useApp } from "../context/useApp";
 
 export const Navbar = () => {
   const { isAuthenticated, logout, user } = useApp();
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full px-4 pt-4 pb-2 bg-zinc-50/50 backdrop-blur-md">
@@ -98,7 +100,89 @@ export const Navbar = () => {
               <span className="hidden sm:inline">Sign In</span>
             </Link>
           )}
+
+          {/* Mobile menu toggle */}
+          <button
+            type="button"
+            className="md:hidden p-2 rounded-lg text-zinc-600 hover:bg-zinc-100"
+            onClick={() => setOpen((s) => !s)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {/* Mobile menu (small screens) */}
+        {open && (
+          <div className="absolute left-4 right-4 top-full mt-3 bg-white rounded-2xl shadow-lg p-3 md:hidden z-50">
+            <div className="flex flex-col gap-2">
+              <NavLink
+                to="/vault"
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-2 rounded-lg text-sm ${
+                    isActive
+                      ? "bg-zinc-900 text-white"
+                      : "text-zinc-700 hover:bg-zinc-50"
+                  }`
+                }
+              >
+                All Word Vault
+              </NavLink>
+              {isAuthenticated && (
+                <NavLink
+                  to="/learning"
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `block px-4 py-2 rounded-lg text-sm ${
+                      isActive
+                        ? "bg-zinc-900 text-white"
+                        : "text-zinc-700 hover:bg-zinc-50"
+                    }`
+                  }
+                >
+                  Currently Learning
+                </NavLink>
+              )}
+              {isAuthenticated && (
+                <NavLink
+                  to="/top-pics"
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `block px-4 py-2 rounded-lg text-sm ${
+                      isActive
+                        ? "bg-zinc-900 text-white"
+                        : "text-zinc-700 hover:bg-zinc-50"
+                    }`
+                  }
+                >
+                  Your Top Pics
+                </NavLink>
+              )}
+
+              {/* Add / Auth actions */}
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    logout();
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-lg text-sm text-zinc-700 hover:bg-zinc-50"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-2 rounded-lg text-sm text-zinc-700 hover:bg-zinc-50"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
