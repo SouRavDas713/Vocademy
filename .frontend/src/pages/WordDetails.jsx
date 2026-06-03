@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api } from '../services/api';
-import { useApp } from '../context/useApp';
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { api } from "../services/api";
+import { useApp } from "../context/useApp";
 import {
   ArrowLeft,
   BookOpen,
@@ -11,12 +11,14 @@ import {
   Mail,
   MessageSquareQuote,
   Tag,
-  Volume2
-} from 'lucide-react';
+  Volume2,
+} from "lucide-react";
 
 const DetailBlock = ({ title, children }) => (
   <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-premium space-y-2">
-    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">{title}</h2>
+    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+      {title}
+    </h2>
     <div className="text-sm leading-relaxed text-zinc-700">{children}</div>
   </section>
 );
@@ -26,14 +28,18 @@ const WordChipList = ({ items, tone }) => {
     return <span className="text-xs italic text-zinc-400">No entries yet</span>;
   }
 
-  const colorClass = tone === 'rose'
-    ? 'bg-rose-50 text-rose-700 border-rose-100'
-    : 'bg-emerald-50 text-emerald-700 border-emerald-100';
+  const colorClass =
+    tone === "rose"
+      ? "bg-rose-50 text-rose-700 border-rose-100"
+      : "bg-emerald-50 text-emerald-700 border-emerald-100";
 
   return (
     <div className="flex flex-wrap gap-2">
       {items.map((item, index) => (
-        <span key={`${item}-${index}`} className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${colorClass}`}>
+        <span
+          key={`${item}-${index}`}
+          className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${colorClass}`}
+        >
           {item}
         </span>
       ))}
@@ -50,13 +56,13 @@ export const WordDetails = () => {
 
   const playPronunciation = () => {
     if (!word?.word || !window.speechSynthesis) {
-      showToast('Pronunciation is not available in this browser', 'error');
+      showToast("Pronunciation is not available in this browser", "error");
       return;
     }
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word.word);
-    utterance.lang = 'en-US';
+    utterance.lang = "en-US";
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   };
@@ -67,7 +73,7 @@ export const WordDetails = () => {
       const response = await api.getWord(id);
       setWord(response.data);
     } catch (error) {
-      showToast(error.message || 'Could not load word details', 'error');
+      showToast(error.message || "Could not load word details", "error");
     } finally {
       setLoading(false);
     }
@@ -96,7 +102,7 @@ export const WordDetails = () => {
           <h1 className="text-xl font-bold text-zinc-900">Word not found</h1>
           <button
             type="button"
-            onClick={() => navigate('/vault')}
+            onClick={() => navigate("/vault")}
             className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-bold text-white"
           >
             Back to Vault
@@ -107,8 +113,12 @@ export const WordDetails = () => {
   }
 
   const createdDate = word.createdAt
-    ? new Date(word.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-    : 'Unknown date';
+    ? new Date(word.createdAt).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "Unknown date";
 
   return (
     <div className="max-w-5xl mx-auto px-4 pt-8 pb-16 space-y-6 animate-fade-in">
@@ -194,12 +204,18 @@ export const WordDetails = () => {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <DetailBlock title="English Definition">
-            {word.meaning || <span className="italic text-zinc-400">No definition added</span>}
+            {word.meaning || (
+              <span className="italic text-zinc-400">No definition added</span>
+            )}
           </DetailBlock>
 
           <DetailBlock title="Bangla Meaning">
-            <span className="font-bold text-zinc-800">
-              {word.banglaMeaning || <span className="italic font-normal text-zinc-400">No Bangla meaning added</span>}
+            <span className="bangla-meaning font-bold text-zinc-800">
+              {word.banglaMeaning || (
+                <span className="italic font-normal text-zinc-400">
+                  No Bangla meaning added
+                </span>
+              )}
             </span>
           </DetailBlock>
         </div>
@@ -208,7 +224,11 @@ export const WordDetails = () => {
           <div className="flex gap-3">
             <MessageSquareQuote className="mt-0.5 h-5 w-5 shrink-0 text-indigo-400" />
             <p className="italic">
-              {word.exampleSentence || <span className="italic text-zinc-400">No example sentence added</span>}
+              {word.exampleSentence || (
+                <span className="italic text-zinc-400">
+                  No example sentence added
+                </span>
+              )}
             </p>
           </div>
         </DetailBlock>

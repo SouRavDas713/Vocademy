@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BookMarked,
@@ -12,20 +12,20 @@ import {
   Target,
   Volume2,
   X,
-  XCircle
-} from 'lucide-react';
-import { api } from '../services/api';
-import { useApp } from '../context/useApp';
+  XCircle,
+} from "lucide-react";
+import { api } from "../services/api";
+import { useApp } from "../context/useApp";
 
 const speakWord = (word, showToast) => {
   if (!word || !window.speechSynthesis) {
-    showToast('Pronunciation is not available in this browser', 'error');
+    showToast("Pronunciation is not available in this browser", "error");
     return;
   }
 
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = 'en-US';
+  utterance.lang = "en-US";
   utterance.rate = 0.9;
   window.speechSynthesis.speak(utterance);
 };
@@ -40,21 +40,37 @@ const shuffleArray = (items) => {
 };
 
 const testModes = [
-  { id: 'english', label: 'English Word', description: 'See English cards one by one.' },
-  { id: 'bangla', label: 'Bangla Word', description: 'See Bangla cards one by one.' },
-  { id: 'synonym', label: 'Guess Synonym', description: 'Choose the right synonym.' },
-  { id: 'antonym', label: 'Guess Antonym', description: 'Choose the right antonym.' }
+  {
+    id: "english",
+    label: "English Word",
+    description: "See English cards one by one.",
+  },
+  {
+    id: "bangla",
+    label: "Bangla Word",
+    description: "See Bangla cards one by one.",
+  },
+  {
+    id: "synonym",
+    label: "Guess Synonym",
+    description: "Choose the right synonym.",
+  },
+  {
+    id: "antonym",
+    label: "Guess Antonym",
+    description: "Choose the right antonym.",
+  },
 ];
 
 const fallbackOptionWords = [
-  'similar',
-  'different',
-  'careful',
-  'simple',
-  'strong',
-  'weak',
-  'clear',
-  'hidden'
+  "similar",
+  "different",
+  "careful",
+  "simple",
+  "strong",
+  "weak",
+  "clear",
+  "hidden",
 ];
 
 const LEARNING_TEST_SESSION_SIZE = 12;
@@ -70,7 +86,9 @@ const getWordWeight = (word) => {
   const incorrectRate = total > 0 ? 1 - accuracy : 1;
 
   const now = Date.now();
-  const lastSeenAt = stat.lastSeenAt ? new Date(stat.lastSeenAt).getTime() : null;
+  const lastSeenAt = stat.lastSeenAt
+    ? new Date(stat.lastSeenAt).getTime()
+    : null;
   const hoursSince = lastSeenAt ? (now - lastSeenAt) / (1000 * 60 * 60) : 72;
   const recencyBoost = 1 + Math.min(4, hoursSince / 24);
 
@@ -134,14 +152,14 @@ export const CurrentlyLearning = () => {
   const { showToast } = useApp();
   const [learningItems, setLearningItems] = useState([]);
   const [learningLoading, setLearningLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [busyWordId, setBusyWordId] = useState('');
-  const [testMode, setTestMode] = useState('');
+  const [busyWordId, setBusyWordId] = useState("");
+  const [testMode, setTestMode] = useState("");
   const [testDeck, setTestDeck] = useState([]);
   const [testIndex, setTestIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState("");
   const [testFinished, setTestFinished] = useState(false);
   const [quizAnsweredCount, setQuizAnsweredCount] = useState(0);
   const [quizCorrectCount, setQuizCorrectCount] = useState(0);
@@ -160,13 +178,16 @@ export const CurrentlyLearning = () => {
   const currentTestWord = testDeck[testIndex] || null;
 
   const currentQuestion = useMemo(() => {
-    if (!currentTestWord || !['synonym', 'antonym'].includes(testMode)) {
+    if (!currentTestWord || !["synonym", "antonym"].includes(testMode)) {
       return null;
     }
 
-    const answerList = testMode === 'synonym' ? currentTestWord.synonyms : currentTestWord.antonyms;
+    const answerList =
+      testMode === "synonym"
+        ? currentTestWord.synonyms
+        : currentTestWord.antonyms;
     const answerCandidates = Array.from(
-      new Set((answerList || []).map((s) => (s || '').trim()).filter(Boolean))
+      new Set((answerList || []).map((s) => (s || "").trim()).filter(Boolean)),
     );
 
     if (!answerCandidates.length) return null;
@@ -175,23 +196,31 @@ export const CurrentlyLearning = () => {
     const correctAnswer = shuffledAnswers[testIndex % shuffledAnswers.length];
 
     const sameTypePool = testDeck
-      .flatMap((word) => (testMode === 'synonym' ? word.synonyms : word.antonyms) || [])
-      .map((s) => (s || '').trim())
+      .flatMap(
+        (word) =>
+          (testMode === "synonym" ? word.synonyms : word.antonyms) || [],
+      )
+      .map((s) => (s || "").trim())
       .filter(Boolean)
       .filter((item) => item !== correctAnswer);
 
     const fallbackPool = learningWords
-      .flatMap((word) => (testMode === 'synonym' ? word.synonyms : word.antonyms) || [])
-      .map((s) => (s || '').trim())
+      .flatMap(
+        (word) =>
+          (testMode === "synonym" ? word.synonyms : word.antonyms) || [],
+      )
+      .map((s) => (s || "").trim())
       .filter(Boolean)
       .filter((item) => item !== correctAnswer);
 
     const distractorCandidates = Array.from(
-      new Set([...sameTypePool, ...fallbackPool, ...fallbackOptionWords])
+      new Set([...sameTypePool, ...fallbackPool, ...fallbackOptionWords]),
     ).filter((item) => item && item !== correctAnswer);
 
     const distractors = shuffleArray(distractorCandidates).slice(0, 3);
-    const options = Array.from(new Set(shuffleArray([correctAnswer, ...distractors]))).slice(0, 4);
+    const options = Array.from(
+      new Set(shuffleArray([correctAnswer, ...distractors])),
+    ).slice(0, 4);
 
     return {
       correctAnswer,
@@ -205,7 +234,7 @@ export const CurrentlyLearning = () => {
       const response = await api.getLearningWords();
       setLearningItems(response.data || []);
     } catch (error) {
-      showToast(error.message || 'Could not load learning list', 'error');
+      showToast(error.message || "Could not load learning list", "error");
     } finally {
       setLearningLoading(false);
     }
@@ -227,13 +256,13 @@ export const CurrentlyLearning = () => {
         const response = await api.getWords({
           page: 1,
           limit: 8,
-          sortBy: 'word',
-          order: 'asc',
-          search: searchTerm.trim()
+          sortBy: "word",
+          order: "asc",
+          search: searchTerm.trim(),
         });
         setSearchResults(response.data || []);
       } catch (error) {
-        showToast(error.message || 'Could not search vault', 'error');
+        showToast(error.message || "Could not search vault", "error");
       } finally {
         setSearchLoading(false);
       }
@@ -246,17 +275,20 @@ export const CurrentlyLearning = () => {
     setBusyWordId(wordId);
     try {
       const response = await api.addLearningWord(wordId);
-      setLearningItems(prev => {
-        if (prev.some(item => item.word?._id === response.data.word._id)) {
+      setLearningItems((prev) => {
+        if (prev.some((item) => item.word?._id === response.data.word._id)) {
           return prev;
         }
         return [response.data, ...prev];
       });
-      showToast(response.message || 'Word added to Currently Learning', 'success');
+      showToast(
+        response.message || "Word added to Currently Learning",
+        "success",
+      );
     } catch (error) {
-      showToast(error.message || 'Could not add word', 'error');
+      showToast(error.message || "Could not add word", "error");
     } finally {
-      setBusyWordId('');
+      setBusyWordId("");
     }
   };
 
@@ -264,24 +296,26 @@ export const CurrentlyLearning = () => {
     setBusyWordId(wordId);
     try {
       const response = await api.markLearningWordLearned(wordId);
-      setLearningItems(prev => prev.filter(item => item.word?._id !== wordId));
-      showToast(response.message || 'Marked as learned', 'success');
+      setLearningItems((prev) =>
+        prev.filter((item) => item.word?._id !== wordId),
+      );
+      showToast(response.message || "Marked as learned", "success");
     } catch (error) {
-      showToast(error.message || 'Could not mark learned', 'error');
+      showToast(error.message || "Could not mark learned", "error");
     } finally {
-      setBusyWordId('');
+      setBusyWordId("");
     }
   };
 
   const startTest = (mode) => {
     const modeWords = (() => {
-      if (mode === 'synonym') {
+      if (mode === "synonym") {
         return learningWords.filter((word) => word.synonyms?.length);
       }
-      if (mode === 'antonym') {
+      if (mode === "antonym") {
         return learningWords.filter((word) => word.antonyms?.length);
       }
-      if (mode === 'bangla') {
+      if (mode === "bangla") {
         return learningWords.filter((word) => word.banglaMeaning);
       }
       return learningWords;
@@ -290,7 +324,7 @@ export const CurrentlyLearning = () => {
     setTestMode(mode);
     setTestDeck(buildSessionDeck(modeWords));
     setTestIndex(0);
-    setSelectedOption('');
+    setSelectedOption("");
     setTestFinished(false);
     setQuizAnsweredCount(0);
     setQuizCorrectCount(0);
@@ -298,10 +332,10 @@ export const CurrentlyLearning = () => {
   };
 
   const quitTest = () => {
-    setTestMode('');
+    setTestMode("");
     setTestDeck([]);
     setTestIndex(0);
-    setSelectedOption('');
+    setSelectedOption("");
     setTestFinished(false);
     setQuizAnsweredCount(0);
     setQuizCorrectCount(0);
@@ -316,27 +350,31 @@ export const CurrentlyLearning = () => {
     const nextIndex = testIndex + 1;
     if (nextIndex >= testDeck.length) {
       setTestFinished(true);
-      setSelectedOption('');
+      setSelectedOption("");
       return;
     }
 
     setTestIndex(nextIndex);
-    setSelectedOption('');
+    setSelectedOption("");
   };
 
-  const isQuizMode = testMode === 'synonym' || testMode === 'antonym';
-  const selectedIsCorrect = selectedOption && currentQuestion?.correctAnswer === selectedOption;
+  const isQuizMode = testMode === "synonym" || testMode === "antonym";
+  const selectedIsCorrect =
+    selectedOption && currentQuestion?.correctAnswer === selectedOption;
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-8 pb-16 space-y-8 animate-fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
-          <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Focused Revision</span>
+          <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
+            Focused Revision
+          </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 font-display">
             Currently Learning ({learningItems.length})
           </h1>
           <p className="text-sm text-zinc-500 max-w-2xl">
-            Build today&apos;s target list from the vault, revise only these words, then mark them learned when they are done.
+            Build today&apos;s target list from the vault, revise only these
+            words, then mark them learned when they are done.
           </p>
         </div>
         <div className="inline-flex w-fit items-center gap-2 rounded-2xl bg-white px-4 py-3 text-xs font-bold text-zinc-500 shadow-premium border border-zinc-200">
@@ -348,7 +386,9 @@ export const CurrentlyLearning = () => {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-indigo-500" />
-          <h2 className="text-lg font-bold text-zinc-900 font-display">Test Your Current Words</h2>
+          <h2 className="text-lg font-bold text-zinc-900 font-display">
+            Test Your Current Words
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -360,12 +400,16 @@ export const CurrentlyLearning = () => {
               disabled={learningWords.length === 0}
               className={`rounded-2xl border p-4 text-left transition-all disabled:opacity-50 ${
                 testMode === mode.id
-                  ? 'border-indigo-300 bg-indigo-50 text-indigo-900 shadow-premium'
-                  : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 shadow-premium'
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-900 shadow-premium"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 shadow-premium"
               }`}
             >
-              <span className="block text-sm font-extrabold font-display">{mode.label}</span>
-              <span className="mt-1 block text-xs text-zinc-500">{mode.description}</span>
+              <span className="block text-sm font-extrabold font-display">
+                {mode.label}
+              </span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                {mode.description}
+              </span>
             </button>
           ))}
         </div>
@@ -393,34 +437,33 @@ export const CurrentlyLearning = () => {
                 {isQuizMode ? (
                   <>
                     <p className="text-sm text-zinc-600">
-                      Accuracy <span className="font-bold">{quizCorrectCount}</span>/{quizAnsweredCount}{" "}
-                      ({quizAnsweredCount ? Math.round((quizCorrectCount / quizAnsweredCount) * 100) : 0}%)
+                      Accuracy{" "}
+                      <span className="font-bold">{quizCorrectCount}</span>/
+                      {quizAnsweredCount} (
+                      {quizAnsweredCount
+                        ? Math.round(
+                            (quizCorrectCount / quizAnsweredCount) * 100,
+                          )
+                        : 0}
+                      %)
                     </p>
 
-                    {Array.from(new Set(quizResults.filter((r) => !r.isCorrect).map((r) => r.wordId))).length > 0 ? (
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">
-                          Words to review
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-2">
-                          {Array.from(new Set(quizResults.filter((r) => !r.isCorrect).map((r) => r.wordId))).slice(0, 10).map((wordId) => (
-                            <Link
-                              key={`${wordId}-learning-review`}
-                              to={`/words/${wordId}`}
-                              className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
-                            >
-                              Review
-                            </Link>
-                          ))}
-                        </div>
+                    {Array.from(
+                      new Set(
+                        quizResults
+                          .filter((r) => !r.isCorrect)
+                          .map((r) => r.wordId),
+                      ),
+                    ).length === 0 && (
+                      <div className="text-sm font-bold text-emerald-700">
+                        Perfect run.
                       </div>
-                    ) : (
-                      <div className="text-sm font-bold text-emerald-700">Perfect run.</div>
                     )}
                   </>
                 ) : (
                   <p className="text-sm text-zinc-600">
-                    Revised <span className="font-bold">{testDeck.length}</span> words.
+                    Revised <span className="font-bold">{testDeck.length}</span>{" "}
+                    words.
                   </p>
                 )}
 
@@ -436,9 +479,17 @@ export const CurrentlyLearning = () => {
             ) : testDeck.length === 0 ? (
               <div className="py-8 text-center space-y-2">
                 <XCircle className="mx-auto h-8 w-8 text-zinc-300" />
-                <h3 className="font-bold text-zinc-800">No words ready for this test</h3>
+                <h3 className="font-bold text-zinc-800">
+                  No words ready for this test
+                </h3>
                 <p className="text-xs text-zinc-400">
-                  Add words with {testMode === 'synonym' ? 'synonyms' : testMode === 'antonym' ? 'antonyms' : 'Bangla meanings'} first.
+                  Add words with{" "}
+                  {testMode === "synonym"
+                    ? "synonyms"
+                    : testMode === "antonym"
+                      ? "antonyms"
+                      : "Bangla meanings"}{" "}
+                  first.
                 </p>
               </div>
             ) : (
@@ -461,16 +512,22 @@ export const CurrentlyLearning = () => {
 
                 <div className="rounded-3xl bg-zinc-50 p-8 text-center space-y-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-indigo-500">
-                    {testMode === 'english' && 'Read the English word'}
-                    {testMode === 'bangla' && 'Read the Bangla meaning'}
-                    {testMode === 'synonym' && 'Pick the synonym'}
-                    {testMode === 'antonym' && 'Pick the antonym'}
+                    {testMode === "english" && "Read the English word"}
+                    {testMode === "bangla" && "Read the Bangla meaning"}
+                    {testMode === "synonym" && "Pick the synonym"}
+                    {testMode === "antonym" && "Pick the antonym"}
                   </span>
-                  <h3 className="wrap-break-word text-4xl font-extrabold text-zinc-950 font-display">
-                    {testMode === 'bangla' ? currentTestWord.banglaMeaning : currentTestWord.word}
+                  <h3
+                    className={`wrap-break-word text-4xl font-extrabold text-zinc-950 font-display ${testMode === "bangla" ? "bangla-meaning" : ""}`}
+                  >
+                    {testMode === "bangla"
+                      ? currentTestWord.banglaMeaning
+                      : currentTestWord.word}
                   </h3>
-                  {testMode === 'english' && currentTestWord.pronunciation && (
-                    <p className="font-mono text-sm font-bold text-zinc-400">{currentTestWord.pronunciation}</p>
+                  {testMode === "english" && currentTestWord.pronunciation && (
+                    <p className="font-mono text-sm font-bold text-zinc-400">
+                      {currentTestWord.pronunciation}
+                    </p>
                   )}
                 </div>
 
@@ -478,7 +535,8 @@ export const CurrentlyLearning = () => {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {currentQuestion.options.map((option) => {
                       const isSelected = selectedOption === option;
-                      const isCorrect = currentQuestion.correctAnswer === option;
+                      const isCorrect =
+                        currentQuestion.correctAnswer === option;
                       const showCorrect = selectedOption && isCorrect;
                       const showWrong = isSelected && !isCorrect;
 
@@ -488,10 +546,13 @@ export const CurrentlyLearning = () => {
                           type="button"
                           onClick={() => {
                             if (!currentTestWord || !currentQuestion) return;
-                            const isCorrectChoice = option === currentQuestion.correctAnswer;
+                            const isCorrectChoice =
+                              option === currentQuestion.correctAnswer;
                             setSelectedOption(option);
                             setQuizAnsweredCount((prev) => prev + 1);
-                            setQuizCorrectCount((prev) => prev + (isCorrectChoice ? 1 : 0));
+                            setQuizCorrectCount(
+                              (prev) => prev + (isCorrectChoice ? 1 : 0),
+                            );
                             setQuizResults((prev) => [
                               ...prev,
                               {
@@ -500,15 +561,20 @@ export const CurrentlyLearning = () => {
                                 isCorrect: isCorrectChoice,
                               },
                             ]);
-                            api.recordTestAnswer({ wordId: currentTestWord._id, isCorrect: isCorrectChoice }).catch(() => {});
+                            api
+                              .recordTestAnswer({
+                                wordId: currentTestWord._id,
+                                isCorrect: isCorrectChoice,
+                              })
+                              .catch(() => {});
                           }}
                           disabled={Boolean(selectedOption)}
                           className={`rounded-2xl border px-4 py-3 text-left text-sm font-bold transition-all ${
                             showCorrect
-                              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                               : showWrong
-                                ? 'border-rose-200 bg-rose-50 text-rose-700'
-                                : 'border-zinc-200 bg-white text-zinc-700 hover:border-indigo-200 hover:bg-indigo-50'
+                                ? "border-rose-200 bg-rose-50 text-rose-700"
+                                : "border-zinc-200 bg-white text-zinc-700 hover:border-indigo-200 hover:bg-indigo-50"
                           } disabled:cursor-default`}
                         >
                           {option}
@@ -519,11 +585,15 @@ export const CurrentlyLearning = () => {
                 )}
 
                 {selectedOption && isQuizMode && (
-                  <div className={`rounded-2xl px-4 py-3 text-sm font-bold ${
-                    selectedIsCorrect ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                  }`}>
+                  <div
+                    className={`rounded-2xl px-4 py-3 text-sm font-bold ${
+                      selectedIsCorrect
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-rose-50 text-rose-700"
+                    }`}
+                  >
                     {selectedIsCorrect
-                      ? 'Correct.'
+                      ? "Correct."
                       : `Wrong. Answer: ${currentQuestion.correctAnswer}`}
                   </div>
                 )}
@@ -548,30 +618,45 @@ export const CurrentlyLearning = () => {
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center gap-2">
             <BookMarked className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-lg font-bold text-zinc-900 font-display">Revise List</h2>
+            <h2 className="text-lg font-bold text-zinc-900 font-display">
+              Revise List
+            </h2>
           </div>
 
           {learningLoading ? (
             <div className="grid gap-4">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="h-36 rounded-2xl bg-zinc-100 animate-pulse" />
+                <div
+                  key={item}
+                  className="h-36 rounded-2xl bg-zinc-100 animate-pulse"
+                />
               ))}
             </div>
           ) : learningItems.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-zinc-200 bg-zinc-50/50 py-16 text-center space-y-3">
               <Layers className="mx-auto h-8 w-8 text-zinc-400" />
-              <h3 className="font-bold text-zinc-800">No words in your focus list</h3>
-              <p className="text-xs text-zinc-400">Search the vault and add words you want to revise.</p>
+              <h3 className="font-bold text-zinc-800">
+                No words in your focus list
+              </h3>
+              <p className="text-xs text-zinc-400">
+                Search the vault and add words you want to revise.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {learningItems.map((item) => {
                 const word = item.word;
                 return (
-                  <article key={item._id} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-premium space-y-4">
+                  <article
+                    key={item._id}
+                    className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-premium space-y-4"
+                  >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-3">
-                        <Link to={`/words/${word._id}`} className="text-xl font-extrabold text-zinc-950 transition-colors hover:text-indigo-600 font-display">
+                        <Link
+                          to={`/words/${word._id}`}
+                          className="text-xl font-extrabold text-zinc-950 transition-colors hover:text-indigo-600 font-display"
+                        >
                           {word.word}
                         </Link>
                         <button
@@ -584,13 +669,15 @@ export const CurrentlyLearning = () => {
                         </button>
                       </div>
                       {word.pronunciation && (
-                        <p className="font-mono text-xs font-bold text-zinc-400">{word.pronunciation}</p>
+                        <p className="font-mono text-xs font-bold text-zinc-400">
+                          {word.pronunciation}
+                        </p>
                       )}
                       <p className="line-clamp-3 text-sm leading-relaxed text-zinc-600">
-                        {word.meaning || 'No definition added'}
+                        {word.meaning || "No definition added"}
                       </p>
                       {word.banglaMeaning && (
-                        <span className="inline-flex rounded-lg bg-zinc-100 px-2.5 py-1 text-xs font-bold text-zinc-600">
+                        <span className="bangla-meaning inline-flex rounded-lg bg-zinc-100 px-2.5 py-1 text-xs font-bold text-zinc-600">
                           {word.banglaMeaning}
                         </span>
                       )}
@@ -603,7 +690,7 @@ export const CurrentlyLearning = () => {
                       className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-600 disabled:opacity-50"
                     >
                       <CheckCircle2 className="h-4 w-4" />
-                      {busyWordId === word._id ? 'Updating...' : 'Learned'}
+                      {busyWordId === word._id ? "Updating..." : "Learned"}
                     </button>
                   </article>
                 );
@@ -615,8 +702,12 @@ export const CurrentlyLearning = () => {
         <aside className="lg:col-span-5 lg:sticky lg:top-24 self-start space-y-4">
           <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-premium space-y-4">
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-zinc-900 font-display">Add From Vault</h2>
-              <p className="text-xs text-zinc-400">Search saved words and add them to this private list.</p>
+              <h2 className="text-lg font-bold text-zinc-900 font-display">
+                Add From Vault
+              </h2>
+              <p className="text-xs text-zinc-400">
+                Search saved words and add them to this private list.
+              </p>
             </div>
 
             <div className="relative">
@@ -643,12 +734,20 @@ export const CurrentlyLearning = () => {
                 searchResults.map((word) => {
                   const alreadyAdded = learningWordIds.has(word._id);
                   return (
-                    <div key={word._id} className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-3">
+                    <div
+                      key={word._id}
+                      className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-3"
+                    >
                       <div className="min-w-0">
-                        <Link to={`/words/${word._id}`} className="truncate font-bold text-zinc-900 transition-colors hover:text-indigo-600">
+                        <Link
+                          to={`/words/${word._id}`}
+                          className="truncate font-bold text-zinc-900 transition-colors hover:text-indigo-600"
+                        >
                           {word.word}
                         </Link>
-                        <p className="truncate text-xs text-zinc-500">{word.meaning || word.banglaMeaning}</p>
+                        <p className="truncate text-xs text-zinc-500">
+                          {word.meaning || word.banglaMeaning}
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -656,12 +755,18 @@ export const CurrentlyLearning = () => {
                         disabled={alreadyAdded || busyWordId === word._id}
                         className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all ${
                           alreadyAdded
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : 'bg-indigo-500 text-white hover:bg-indigo-600'
+                            ? "bg-emerald-50 text-emerald-600"
+                            : "bg-indigo-500 text-white hover:bg-indigo-600"
                         } disabled:opacity-80`}
-                        title={alreadyAdded ? 'Already added' : `Add ${word.word}`}
+                        title={
+                          alreadyAdded ? "Already added" : `Add ${word.word}`
+                        }
                       >
-                        {alreadyAdded ? <CheckCircle2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                        {alreadyAdded ? (
+                          <CheckCircle2 className="h-4 w-4" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   );

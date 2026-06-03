@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const bootstrapAdmin = require("./utils/bootstrapAdmin");
 const authRoutes = require("./routes/authRoutes");
 const learningRoutes = require("./routes/learningRoutes");
+const topPicsRoutes = require("./routes/topPicsRoutes");
 const wordRoutes = require("./routes/wordRoutes");
 
 // Load environment variables
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 // Mounting Routing Modules
 app.use("/api/auth", authRoutes);
 app.use("/api/learning", learningRoutes);
+app.use("/api/top-pics", topPicsRoutes);
 app.use("/api/words", wordRoutes);
 
 // 404 Route handler

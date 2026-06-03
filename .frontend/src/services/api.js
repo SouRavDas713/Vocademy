@@ -65,65 +65,82 @@ export const api = {
   me: () => request("/auth/me"),
 
   // Words
-getWords: (params = {}) => {
-  const query = new URLSearchParams();
-  Object.keys(params).forEach((key) => {
-    if (params[key] !== undefined && params[key] !== null) {
-      query.append(key, params[key]);
+  getWords: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null) {
+        query.append(key, params[key]);
+      }
+    });
+    const queryString = query.toString();
+    return request(`/words?${queryString}`);
+  },
+
+  getWord: (id) => {
+    return request(`/words/${id}`);
+  },
+
+  getTestQuestion: (type, { seenIds } = {}) => {
+    const query = new URLSearchParams();
+    query.append("type", type);
+    if (seenIds && seenIds.length) {
+      query.append("seenIds", seenIds.join(","));
     }
-  });
-  const queryString = query.toString();
-  return request(`/words?${queryString}`);
-},
+    return request(`/words/test-question?${query.toString()}`);
+  },
 
-getWord: (id) => {
-  return request(`/words/${id}`);
-},
+  createWord: (wordData) => {
+    return request("/words", {
+      method: "POST",
+      body: wordData,
+    });
+  },
 
-getTestQuestion: (type, { seenIds } = {}) => {
-  const query = new URLSearchParams();
-  query.append("type", type);
-  if (seenIds && seenIds.length) {
-    query.append("seenIds", seenIds.join(","));
-  }
-  return request(`/words/test-question?${query.toString()}`);
-},
+  updateWord: (id, wordData) => {
+    return request(`/words/${id}`, {
+      method: "PUT",
+      body: wordData,
+    });
+  },
 
-createWord: (wordData) => {
-  return request("/words", {
-    method: "POST",
-    body: wordData,
-  });
-},
+  getLearningWords: () => {
+    return request("/learning");
+  },
 
-updateWord: (id, wordData) => {
-  return request(`/words/${id}`, {
-    method: "PUT",
-    body: wordData,
-  });
-},
+  addLearningWord: (wordId) => {
+    return request("/learning", {
+      method: "POST",
+      body: { wordId },
+    });
+  },
 
-getLearningWords: () => {
-  return request("/learning");
-},
+  markLearningWordLearned: (wordId) => {
+    return request(`/learning/${wordId}/learned`, {
+      method: "DELETE",
+    });
+  },
 
-addLearningWord: (wordId) => {
-  return request("/learning", {
-    method: "POST",
-    body: { wordId },
-  });
-},
+  recordTestAnswer: ({ wordId, isCorrect }) => {
+    return request("/words/test-answer", {
+      method: "POST",
+      body: { wordId, isCorrect },
+    });
+  },
+  // Top Pics - fall back to existing learning endpoints when top-pics route is unavailable
+  getTopPics: () => {
+    return request("/learning");
+  },
 
-markLearningWordLearned: (wordId) => {
-  return request(`/learning/${wordId}/learned`, {
-    method: "DELETE",
-  });
-},
+  addTopPic: (wordId) => {
+    return request("/learning", {
+      method: "POST",
+      body: { wordId },
+    });
+  },
 
-recordTestAnswer: ({ wordId, isCorrect }) => {
-  return request("/words/test-answer", {
-    method: "POST",
-    body: { wordId, isCorrect },
-  });
-},
+  removeTopPic: (wordId) => {
+    return request(`/learning/${wordId}/learned`, {
+      method: "DELETE",
+    });
+  },
 };

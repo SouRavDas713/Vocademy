@@ -468,28 +468,15 @@ export const AllWords = () => {
                       </p>
                     </div>
 
-                    {missedWords.length > 0 ? (
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold uppercase tracking-wider text-zinc-500 text-center">
-                          Words to review
-                        </p>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          {Array.from(new Set(missedWords))
-                            .slice(0, 8)
-                            .map((wordId) => (
-                              <Link
-                                key={`${wordId}-review`}
-                                to={`/words/${wordId}`}
-                                className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
-                              >
-                                Review
-                              </Link>
-                            ))}
-                        </div>
-                      </div>
-                    ) : (
+                    {missedWords.length === 0 ? (
                       <div className="text-center text-sm font-bold text-emerald-700">
                         Perfect run.
+                      </div>
+                    ) : (
+                      <div className="text-center text-sm font-medium text-zinc-600">
+                        You missed{" "}
+                        <span className="font-bold">{missedWords.length}</span>{" "}
+                        word(s).
                       </div>
                     )}
 
@@ -662,7 +649,7 @@ export const AllWords = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-zinc-50 mt-4">
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-600">
+                  <span className="bangla-meaning text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-600">
                     {word.banglaMeaning}
                   </span>
 
@@ -702,7 +689,7 @@ export const AllWords = () => {
                   </div>
 
                   <div className="flex items-center gap-3 pr-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 whitespace-nowrap">
+                    <span className="bangla-meaning text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 whitespace-nowrap">
                       {word.banglaMeaning}
                     </span>
 

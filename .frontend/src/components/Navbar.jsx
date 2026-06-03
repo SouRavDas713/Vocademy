@@ -1,6 +1,6 @@
-import { NavLink, Link } from 'react-router-dom';
-import { BookOpen, LogIn, LogOut, Sparkles } from 'lucide-react';
-import { useApp } from '../context/useApp';
+import { NavLink, Link } from "react-router-dom";
+import { BookOpen, LogIn, LogOut, Sparkles } from "lucide-react";
+import { useApp } from "../context/useApp";
 
 export const Navbar = () => {
   const { isAuthenticated, logout, user } = useApp();
@@ -8,7 +8,6 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-40 w-full px-4 pt-4 pb-2 bg-zinc-50/50 backdrop-blur-md">
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl glass-panel shadow-premium">
-        
         {/* Branding Logo */}
         <Link to="/vault" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-all">
@@ -25,9 +24,9 @@ export const Navbar = () => {
             to="/vault"
             className={({ isActive }) =>
               `px-4 py-2 rounded-xl text-sm transition-all duration-200 ${
-                isActive 
-                  ? 'bg-zinc-900 text-white shadow-md shadow-zinc-900/10' 
-                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
+                isActive
+                  ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10"
+                  : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100"
               }`
             }
           >
@@ -38,13 +37,27 @@ export const Navbar = () => {
               to="/learning"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-xl text-sm transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-zinc-900 text-white shadow-md shadow-zinc-900/10' 
-                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
+                  isActive
+                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10"
+                    : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100"
                 }`
               }
             >
               Currently Learning
+            </NavLink>
+          )}
+          {isAuthenticated && (
+            <NavLink
+              to="/top-pics"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-xl text-sm transition-all duration-200 ${
+                  isActive
+                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10"
+                    : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100"
+                }`
+              }
+            >
+              Your Top Pics
             </NavLink>
           )}
         </div>
@@ -58,7 +71,7 @@ export const Navbar = () => {
           )}
 
           {isAuthenticated && (
-            <Link 
+            <Link
               to="/add"
               className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-indigo-500 rounded-xl hover:bg-indigo-600 shadow-md shadow-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-98 transition-all"
             >
